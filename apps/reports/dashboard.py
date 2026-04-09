@@ -53,6 +53,6 @@ class DashboardStatsView(APIView):
         if user.role == 'HISOBCHI':
             from apps.invoices.models import ShotInvoice
             stats['total_invoices'] = ShotInvoice.objects.count()
-            stats['pending_invoices'] = ShotInvoice.objects.filter(status='PENDING').count()
+            stats['pending_invoices'] = ShotInvoice.objects.filter(file='').count()
 
         return Response(stats)

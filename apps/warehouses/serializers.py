@@ -10,7 +10,7 @@ class WarehouseSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'address', 'responsible_user',
             'responsible_user_name', 'capacity', 'description',
-            'is_active', 'created_at',
+            'is_main', 'is_active', 'created_at',
         ]
         read_only_fields = ['id', 'created_at']
 

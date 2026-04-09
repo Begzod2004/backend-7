@@ -4,7 +4,7 @@ from .models import ShotInvoice
 
 @admin.register(ShotInvoice)
 class ShotInvoiceAdmin(admin.ModelAdmin):
-    list_display = ('invoice_number', 'supplier_name', 'warehouse', 'total_amount', 'status', 'created_at')
-    list_filter = ('status', 'warehouse')
-    search_fields = ('invoice_number', 'supplier_name', 'document_number')
-    readonly_fields = ('invoice_number', 'total_amount')
+    list_display = ('invoice_number', 'batch', 'warehouse', 'stock_status', 'confirmation_status', 'created_at')
+    list_filter = ('warehouse',)
+    search_fields = ('invoice_number', 'batch__batch_number')
+    readonly_fields = ('invoice_number', 'batch', 'warehouse', 'created_by')

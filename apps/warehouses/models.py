@@ -12,6 +12,7 @@ class Warehouse(models.Model):
     )
     capacity = models.PositiveIntegerField(default=0, verbose_name='Sig\'imi')
     description = models.TextField(blank=True, verbose_name='Tavsif')
+    is_main = models.BooleanField(default=False, verbose_name='Asosiy ombor')
     is_active = models.BooleanField(default=True, verbose_name='Faol')
     created_at = models.DateTimeField(auto_now_add=True)
 

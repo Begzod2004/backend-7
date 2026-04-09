@@ -156,22 +156,13 @@ class Command(BaseCommand):
 
         # --- Invoices ---
         if ShotInvoice.objects.count() == 0:
-            suppliers = [
-                'OOO Tosh Temir Markazi', 'MCHJ Global Stroy', 'IP Karimov B.',
-                'OOO ElektroSnab', 'MCHJ SanitarPlast', 'OOO BoyoqServis',
-            ]
-            hisobchi = CustomUser.objects.filter(role='HISOBCHI').first() or admin
-            batches = list(Batch.objects.all()[:15])
-            for i, batch in enumerate(batches):
+            batches_without_invoice = Batch.objects.filter(invoice__isnull=True)[:15]
+            for i, batch in enumerate(batches_without_invoice):
                 ShotInvoice.objects.create(
-                    batch=batch, warehouse=batch.warehouse,
-                    created_by=hisobchi,
-                    quantity=batch.quantity, price=batch.price,
-                    supplier_name=random.choice(suppliers),
-                    document_date=date.today() - timedelta(days=random.randint(1, 60)),
-                    document_number=f'DX-{random.randint(1000, 9999)}',
-                    note=f'Dedox hujjat #{i + 1}',
-                    status=random.choice(['PENDING', 'PAID', 'PAID', 'PAID']),
+                    invoice_number=f'TTI-{random.randint(1000, 9999)}',
+                    batch=batch,
+                    warehouse=batch.warehouse,
+                    created_by=admin,
                 )
             self.stdout.write(f'  Invoices: {ShotInvoice.objects.count()}')
 
@@ -300,23 +291,13 @@ class Command(BaseCommand):
 
         # --- Payments ---
         if Payment.objects.count() == 0:
-            paid_invoices = ShotInvoice.objects.filter(status='PAID')[:8]
-            for inv in paid_invoices:
+            invoices = list(ShotInvoice.objects.all()[:8])
+            for inv in invoices:
                 Payment.objects.create(
                     invoice=inv,
-                    amount=inv.total_amount,
+                    amount=Decimal(str(random.randint(1000, 50000))),
                     payment_date=date.today() - timedelta(days=random.randint(1, 30)),
                     payment_method=random.choice(['CASH', 'BANK_TRANSFER']),
-                    created_by=admin,
-                )
-            # Partial payments
-            pending = ShotInvoice.objects.filter(status='PENDING')[:3]
-            for inv in pending:
-                Payment.objects.create(
-                    invoice=inv,
-                    amount=inv.total_amount * Decimal('0.5'),
-                    payment_date=date.today() - timedelta(days=random.randint(1, 15)),
-                    payment_method='BANK_TRANSFER',
                     created_by=admin,
                 )
             self.stdout.write(f'  Payments: {Payment.objects.count()}')

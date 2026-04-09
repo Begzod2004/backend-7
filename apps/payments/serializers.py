@@ -41,17 +41,3 @@ class PaymentCreateSerializer(serializers.ModelSerializer):
         if value <= 0:
             raise serializers.ValidationError("To'lov summasi 0 dan katta bo'lishi kerak.")
         return value
-
-    def validate(self, attrs):
-        invoice = attrs.get('invoice')
-        if invoice:
-            from django.db.models import Sum
-            paid = invoice.payments.aggregate(
-                total_paid=Sum('amount')
-            )['total_paid'] or 0
-            remaining = invoice.total_amount - paid
-            if attrs['amount'] > remaining:
-                raise serializers.ValidationError(
-                    f"To'lov summasi qoldiqdan ({remaining}) oshib ketdi."
-                )
-        return attrs

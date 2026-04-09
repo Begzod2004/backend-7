@@ -29,6 +29,16 @@ class BatchViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         user = self.request.user
+        # Agar warehouse berilmagan bo'lsa, asosiy omborni ishlatamiz
+        from apps.warehouses.models import Warehouse
+        if not serializer.validated_data.get('warehouse'):
+            main_wh = Warehouse.objects.filter(is_main=True).first() or Warehouse.objects.first()
+            if main_wh:
+                serializer.validated_data['warehouse'] = main_wh
+
+        # invoice_number ni ajratib olamiz (BatchSerializer ga kirmaydi)
+        invoice_number = self.request.data.get('invoice_number', '').strip()
+
         batch = serializer.save()
         if user.role == 'KICHIK_OMBOR_ADMINI' and batch.warehouse_id != user.warehouse_id:
             batch.delete()
@@ -41,6 +51,16 @@ class BatchViewSet(viewsets.ModelViewSet):
                 balance_before=0, balance_after=batch.quantity,
                 user=user, warehouse_to=batch.warehouse,
                 note='Yangi partiya yaratildi',
+            )
+
+        # Shot-faktura avtomatik yaratish
+        if invoice_number:
+            from apps.invoices.models import ShotInvoice
+            ShotInvoice.objects.create(
+                invoice_number=invoice_number,
+                batch=batch,
+                warehouse=batch.warehouse,
+                created_by=user,
             )
 
     @action(detail=True, methods=['get'], url_path='movements')

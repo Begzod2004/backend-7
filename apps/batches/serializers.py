@@ -14,10 +14,11 @@ class BatchSerializer(serializers.ModelSerializer):
             'id', 'batch_number', 'product', 'product_name',
             'warehouse', 'warehouse_name', 'unit', 'unit_name',
             'unit_abbreviation', 'quantity', 'min_quantity',
-            'price', 'total_value', 'description', 'status',
+            'price', 'total_value', 'barcode', 'description', 'status',
             'created_at', 'updated_at',
         ]
         read_only_fields = ['id', 'batch_number', 'total_value', 'status', 'created_at', 'updated_at']
+        extra_kwargs = {'warehouse': {'required': False}}
 
 
 class BatchMovementSerializer(serializers.ModelSerializer):

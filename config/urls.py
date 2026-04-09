@@ -48,6 +48,7 @@ urlpatterns = [
     path('api/transfers/', include('apps.transfers.urls')),
     path('api/payments/', include('apps.payments.urls')),
     path('api/estimates/', include('apps.estimates.urls')),
+    path('api/returns/', include(('apps.orders.urls_returns', 'returns'))),
     path('api/telegram/', include('apps.telegram_bot.urls')),
 ]
 
