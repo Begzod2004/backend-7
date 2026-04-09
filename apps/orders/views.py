@@ -50,7 +50,17 @@ class OrderViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = OrderCreateSerializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
-        order = serializer.save()
+        try:
+            order = serializer.save()
+        except Exception as e:
+            return Response(
+                {'error': f'Buyurtma yaratishda xatolik: {str(e)}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        # Qayta yuklash — barcha related fieldlar bilan
+        order = Order.objects.select_related('warehouse', 'created_by').prefetch_related(
+            'items__product__unit', 'items__category', 'items__batch', 'status_history'
+        ).get(id=order.id)
         return Response(OrderSerializer(order).data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['put'], url_path='status')
